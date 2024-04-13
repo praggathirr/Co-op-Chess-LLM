@@ -3,10 +3,10 @@ Handle interactions with the Stockfish chess engine.
 """
 
 import chess
-import chess.engine
+import stockfish
 
 class Stockfish:
-    def __init__(self, path_to_engine='path/to/stockfish'):
+    def __init__(self, path_to_engine='stockfish/16.1'):
         self.engine = chess.engine.SimpleEngine.popen_uci(path_to_engine)
         self.board = chess.Board()
 
