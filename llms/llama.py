@@ -1,7 +1,7 @@
 from transformers import pipeline, AutoModelForCausalLM, AutoTokenizer
 
 class LLamaModel:
-    def __init__(self, model_name):
+    def __init__(self, model_name="Maykeye/TinyLLama-v0"):
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = AutoModelForCausalLM.from_pretrained(model_name)
         self.generator = pipeline('text-generation', model=model, tokenizer=tokenizer)
