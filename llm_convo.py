@@ -1,9 +1,9 @@
 """
 Manage the conversation between two LLMs to decide on chess moves.
 """
+import torch
 import transformers
 from transformers import AutoTokenizer
-import torch
 
 
 class LLMConversation:
@@ -14,7 +14,6 @@ class LLMConversation:
         self.init_prompt = f"You are a chess expert who has been playing the game for several years. You are tasked with playing a game of chess against another player. You must beat this player. You will be prompted with a board state and will be required to provide a move. You must provide reasoning for each move as well as the final move based on your reasoning. Structure your response as: 'Reasoning:'  'Final move:' . You may be provided with addtional feedback from another player who will be playing on the same team as you. You can look at their feedback and chose to agree or disagree with them. You must play whatever you think is the best move. You must come to a conclusion about a move within 5 rounds to discussion."
         _ = self.llm1.generate_response(self.init_prompt)
         _ = self.llm2.generate_response(self.init_prompt)
-
 
     def discuss_move(self, current_state_fen):
         round = 1

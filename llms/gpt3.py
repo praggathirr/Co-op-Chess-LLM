@@ -1,13 +1,15 @@
-import openai
-import time
-import sys
 import os
+import sys
+import time
+
+import openai
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+
 class GPT3Model:
     def __init__(self, model, temperature=0.7):
-        with open(os.path.join(ROOT_DIR, 'openai_key.txt'), 'r') as f:
+        with open(os.path.join(ROOT_DIR, "openai_key.txt"), "r") as f:
             key = f.readline().strip()
             openai.api_key = key
         self.model = model
@@ -18,11 +20,19 @@ class GPT3Model:
         received = False
         while not received:
             try:
-                response = openai.Completion.create(engine=self.model, prompt=prompt, temperature=self.temperature, stop=None, n=1)
+                response = openai.Completion.create(
+                    engine=self.model,
+                    prompt=prompt,
+                    temperature=self.temperature,
+                    stop=None,
+                    n=1,
+                )
                 received = True
             except:
                 error = sys.exc_info()[0]
-                if error == openai.error.InvalidRequestError: # something is wrong: e.g. prompt too long
+                if (
+                    error == openai.error.InvalidRequestError
+                ):  # something is wrong: e.g. prompt too long
                     print(f"InvalidRequestError\nPrompt passed in:\n\n{prompt}\n\n")
                     assert False
 

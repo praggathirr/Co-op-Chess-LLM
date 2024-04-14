@@ -2,11 +2,12 @@
 Main Driver File. Initialize the chess game, interface with Stockfish and your LLM models, and manage the flow of the game.
 """
 
-from stockfish import Stockfish
-from slerp import LLMCombiner
 from llm_convo import LLMConversation
 from llms.gpt3 import GPT3Model
 from llms.llama import LLamaModel
+from slerp import LLMCombiner
+from stockfish import Stockfish
+
 
 class ChessGame:
     def __init__(self):
@@ -28,6 +29,7 @@ class ChessGame:
             if not continue_game:
                 print("Game Over")
                 break
+
 
 if __name__ == "__main__":
     game = ChessGame()

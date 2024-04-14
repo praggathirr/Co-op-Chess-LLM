@@ -2,11 +2,11 @@
 Implementation of SLERP to combine two LLMs.
 """
 
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import mergekit
-from huggingface_hub import HfApi, HfFolder, Repository
-
 import yaml
+from huggingface_hub import HfApi, HfFolder, Repository
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+import mergekit
 
 
 class MergeLLM:
@@ -38,7 +38,7 @@ class MergeLLM:
         dtype: bfloat16
         """
 
-        with open('config.yaml', 'w', encoding="utf-8") as f:
+        with open("config.yaml", "w", encoding="utf-8") as f:
             f.write(yaml_config)
 
     def save_merged_model_local(self, merged_model, path="./merged_model"):
@@ -50,8 +50,12 @@ class MergeLLM:
         # Create a repository in the Hf Hub and get the local path
         api = HfApi()
         token = HfFolder.get_token()
-        namespace = organization if organization is not None else api.whoami(token)["name"]
-        repo_url = api.create_repo(token, path, organization=organization, exist_ok=True, repo_type="model")
+        namespace = (
+            organization if organization is not None else api.whoami(token)["name"]
+        )
+        repo_url = api.create_repo(
+            token, path, organization=organization, exist_ok=True, repo_type="model"
+        )
         local_path = f"./{path}"
         repo = Repository(local_path, clone_from=repo_url, use_auth_token=token)
 
@@ -72,6 +76,5 @@ if __name__ == "__main__":
 
     merged_model = merge.slerp_combine()
 
-    #merge.save_merged_model_local(merged_model, path="./merged_model")
-    #merge.push_to_huggingface(merged_model, "MergeLLM")
-
+    # merge.save_merged_model_local(merged_model, path="./merged_model")
+    # merge.push_to_huggingface(merged_model, "MergeLLM")
