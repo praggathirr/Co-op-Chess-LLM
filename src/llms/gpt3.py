@@ -41,5 +41,7 @@ class GPT3Model:
             except Exception as e:
                 print("Some other error occurred:", e)
                 time.sleep(1)
-        print(response)
-        return response.choices[0].text
+        #print(response)
+        if response:
+            return response.choices[0].text.strip()
+        return None
