@@ -5,12 +5,15 @@ Main Driver File. Initialize the chess game, interface with Stockfish and your L
 from stockfish import Stockfish
 from slerp import LLMCombiner
 from llm_convo import LLMConversation
+from llms.gpt3 import GPT3Model
+from llms.llama import LLamaModel
 
 class ChessGame:
     def __init__(self):
-        self.stockfish = StockfishInterface()
-        self.llm_combiner = LLMSlerp()
-        self.llm_convo = LLMConversation()
+        self.stockfish = Stockfish()
+        self.gpt3 = GPT3Model(temperature=0.6)
+        self.llama = LLamaModel()
+        self.llm_convo = LLMConversation(self.gpt3, self.llama)
         self.current_game_state = None
 
     def play_game(self):
@@ -18,7 +21,7 @@ class ChessGame:
         while continue_game:
             self.current_game_state = self.stockfish.get_current_fen()
 
-            suggested_move = self.llm_convo.decide_move(self.current_game_state)
+            suggested_move = self.llm_convo.discuss_move(self.current_game_state)
 
             continue_game = self.stockfish.make_move(suggested_move)
 
