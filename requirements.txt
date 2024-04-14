@@ -5,7 +5,7 @@ certifi==2024.2.2
 charset-normalizer==3.3.2
 chess==1.10.0
 click==8.1.7
--e git+https://github.com/shreyash2106/CS577_Final_Project@901376a4ba86d5de531b5e79df7ee7d3e0fd2eab#egg=cs577
+-e git+https://github.com/shreyash2106/CS577_Final_Project@e3a0537a3ee64ac4ba3b4a459b4f28cf54b3fa8b#egg=cs577
 distro==1.9.0
 exceptiongroup==1.2.0
 filelock==3.13.4
