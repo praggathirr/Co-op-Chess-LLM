@@ -6,7 +6,7 @@ import os
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class GPT3Model:
-    def __init__(self, model, temperature):
+    def __init__(self, model, temperature=0.7):
         with open(os.path.join(ROOT_DIR, 'openai_key.txt'), 'r') as f:
             key = f.readline().strip()
             openai.api_key = key
