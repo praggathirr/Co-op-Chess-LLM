@@ -21,9 +21,19 @@ class StockfishInterface:
         try:
             move = self.board.parse_san(move)
             self.board.push(move)
+            self.print_board()
             return True
         except ValueError:
             return False
+    
+    def print_board(self):
+        print("Current board layout:")
+        print(self.board) 
+    
+    def engine_move(self, time_limit=0.1):
+        result = self.engine.play(self.board, chess.engine.Limit(time=time_limit))
+        self.board.push(result.move)
+        self.print_board()
 
     # def __del__(self):
     #     self.engine.quit()
