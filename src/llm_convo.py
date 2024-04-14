@@ -1,10 +1,6 @@
 """
 Manage the conversation between two LLMs to decide on chess moves.
 """
-import torch
-import transformers
-from transformers import AutoTokenizer
-
 
 class LLMConversation:
     def __init__(self, llm1, llm2, max_rounds=5):

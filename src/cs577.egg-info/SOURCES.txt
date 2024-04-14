@@ -1,0 +1,6 @@
+README.md
+setup.py
+src/cs577.egg-info/PKG-INFO
+src/cs577.egg-info/SOURCES.txt
+src/cs577.egg-info/dependency_links.txt
+src/cs577.egg-info/top_level.txt

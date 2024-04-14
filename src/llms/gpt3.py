@@ -28,14 +28,16 @@ class GPT3Model:
                     n=1,
                 )
                 received = True
-            except:
-                error = sys.exc_info()[0]
-                if (
-                    error == openai.error.InvalidRequestError
-                ):  # something is wrong: e.g. prompt too long
-                    print(f"InvalidRequestError\nPrompt passed in:\n\n{prompt}\n\n")
-                    assert False
-
-                print("API error:", error)
+            except (openai.PermissionDeniedError, openai.AuthenticationError) as e:
+                print("Permission Denied request:", e)
+                time.sleep(1)
+            except openai.APIConnectionError as e:
+                print("API error occurred:", e)
+                time.sleep(1)
+            except openai.RateLimitError as e:
+                print("Rate limit exceeded:", e)
+                time.sleep(1)
+            except Exception as e:
+                print("Some other error occurred:", e)
                 time.sleep(1)
         return response
