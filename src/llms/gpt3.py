@@ -3,6 +3,8 @@ import sys
 import time
 
 import openai
+from openai import OpenAI
+
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -11,7 +13,7 @@ class GPT3Model:
     def __init__(self, model, temperature=0.7):
         with open(os.path.join(ROOT_DIR, "openai_key.txt"), "r") as f:
             key = f.readline().strip()
-            openai.api_key = key
+        self.client = OpenAI(api_key=key)
         self.model = model
         self.temperature = temperature
 
@@ -20,13 +22,11 @@ class GPT3Model:
         received = False
         while not received:
             try:
-                response = openai.Completion.create(
-                    engine=self.model,
-                    prompt=prompt,
-                    temperature=self.temperature,
-                    stop=None,
-                    n=1,
-                )
+                response = self.client.completions.create(model=self.model,
+                prompt=prompt,
+                temperature=self.temperature,
+                stop=None,
+                n=1)
                 received = True
             except (openai.PermissionDeniedError, openai.AuthenticationError) as e:
                 print("Permission Denied request:", e)
@@ -40,4 +40,4 @@ class GPT3Model:
             except Exception as e:
                 print("Some other error occurred:", e)
                 time.sleep(1)
-        return response
+        return response.choices[0].message.content
