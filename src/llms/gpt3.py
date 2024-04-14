@@ -26,6 +26,7 @@ class GPT3Model:
                 prompt=prompt,
                 temperature=self.temperature,
                 stop=None,
+                max_tokens=1000,
                 n=1)
                 received = True
             except (openai.PermissionDeniedError, openai.AuthenticationError) as e:
@@ -40,4 +41,5 @@ class GPT3Model:
             except Exception as e:
                 print("Some other error occurred:", e)
                 time.sleep(1)
-        return response.choices[0].message.content
+        print(response)
+        return response.choices[0].text
