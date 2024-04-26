@@ -1,0 +1,11 @@
+Game,Winner,Color,Number of Moves,Game Duration
+1,LLM,White,26,558.98
+2,Stockfish,White,96,1719.16
+3,LLM,White,30,546.79
+4,LLM,White,56,951.59
+5,LLM,White,53,8143.41
+6,Stockfish,Black,142,3093.23
+7,Stockfish,Black,29,764.51
+8,Stockfish,Black,45,809.0
+9,Stockfish,Black,48,821.98
+10,LLM,Black,38,2239.22
