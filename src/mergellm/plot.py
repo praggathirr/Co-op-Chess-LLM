@@ -1,34 +1,36 @@
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 
-# Function to check the largest power of 2 that divides k
-def f(k):
-    power_of_2 = 1
-    while k % 2 == 0 and k > 0:
-        k = k // 2
-        power_of_2 *= 2
-    return power_of_2
+data = {
+    "GPT + Finetuned Model": {"1": 1, "2": 10, "3": 15, "4": 8, "5": 6, "6": 6, "NC": 25},
+    "GPT + Mistral": {"1": 3, "2": 5, "3": 8, "4": 12, "5": 7, "6": 10, "NC": 10},
+    "GPT + GPT": {"1": 5, "2": 7, "3": 5, "4": 12, "5": 7, "6": 3, "NC": 8}
+}
 
-# Summing up the function and computing the amortized cost for each n
-def compute_amortized_costs(N):
-    total_cost = 0
-    amortized_costs = []
-    for k in range(1, N + 1):
-        total_cost += f(k)
-        amortized_costs.append(total_cost / k)
-    return amortized_costs
+percent_data = {}
+for model, counts in data.items():
+    total = sum(counts.values())
+    percent_data[model] = {round_key: count / total * 100 for round_key, count in counts.items()}
 
-# Let's compute the amortized costs for n up to 1000
-N = 1000
-amortized_costs = compute_amortized_costs(N)
-n_values = np.arange(1, N + 1)
+rounds = ["1", "2", "3", "4", "5", "6", "NC"] 
 
-# Plotting the amortized cost over n
-plt.figure(figsize=(10, 6))
-plt.plot(n_values, amortized_costs, label='Amortized Cost of f(k)')
-plt.xlabel('n (number of operations)')
-plt.ylabel('Amortized Cost')
-plt.title('Amortized Cost of f(k) Over n Operations')
-plt.legend()
-plt.grid(True)
+values1 = [percent_data["GPT + Finetuned Model"].get(round_key, 0) for round_key in rounds]
+values2 = [percent_data["GPT + Mistral"].get(round_key, 0) for round_key in rounds]
+values3 = [percent_data["GPT + GPT"].get(round_key, 0) for round_key in rounds]
+
+fig, ax = plt.subplots()
+bar_width = 0.25
+index = np.arange(len(rounds))
+
+bar1 = ax.bar(index, values1, bar_width, label='GPT + Finetuned Model')
+bar2 = ax.bar(index + bar_width, values2, bar_width, label='GPT + Mistral')
+bar3 = ax.bar(index + 2 * bar_width, values3, bar_width, label='GPT + GPT')
+
+ax.set_xlabel('Rounds')
+ax.set_ylabel('Percentage of Consensus Reached')
+ax.set_title('Consensus Reached by Round Across Models')
+ax.set_xticks(index + bar_width)
+ax.set_xticklabels(rounds)
+ax.legend()
+
 plt.show()
