@@ -1,6 +1,7 @@
-import chess
-import re
 import random
+import re
+
+import chess
 
 
 class LLMChess:
@@ -29,18 +30,19 @@ class LLMChess:
         #     board.push(move)
         # fen = board.fen()
 
-        
         llm1_prompt = self._generate_prompt(current_state_fen)
-        llm1_move, llm1_response = self.generate_and_validate_move(self.llm1, llm1_prompt, board)
+        llm1_move, llm1_response = self.generate_and_validate_move(
+            self.llm1, llm1_prompt, board
+        )
 
         print("LLM Prompt: ", llm1_prompt)
         print("\n")
         print("LLM Response: ", llm1_response)
         print("\n")
         print("LLM Move: ", llm1_move)
-            
+
         return llm1_move
-    
+
     def get_valid_moves(self, board: chess.Board) -> str:
         """
         Generate a regex pattern that matches all legal moves for the given board.
@@ -56,14 +58,14 @@ class LLMChess:
         legal_moves = list(board.legal_moves)
         move_strings = [board.san(move) for move in legal_moves]
         random.shuffle(move_strings)
-        #move_strings = [re.sub(r"[+#]", "", move) for move in move_strings]
+        # move_strings = [re.sub(r"[+#]", "", move) for move in move_strings]
         regex_pattern = ", ".join(re.escape(move) for move in move_strings)
         return regex_pattern
-    
+
     def generate_and_validate_move(self, llm, prompt, board):
         valid_moves = self.get_valid_moves(board)
-        #valid_moves = self.engine.get_top_moves(board)
-        
+        # valid_moves = self.engine.get_top_moves(board)
+
         prompt += f"\n Choose from the following valid moves for the current position on the board {valid_moves}. "
         prompt += f"\n The current layout of the board is: \n{str(board)}\n The uppercase letters represent white and the lowercase letters represent black. "
         response = llm.generate_response(prompt)
@@ -72,7 +74,7 @@ class LLMChess:
             return move, response
 
         return None, response
-    
+
     def is_valid_fen_move(self, board, move):
         if move is None:
             return False
@@ -87,7 +89,7 @@ class LLMChess:
 
     def _generate_prompt(self, fen):
         prompt = f"Analyze the current board state and provide the best move:\n{fen}\n"
-            
+
         prompt += f" Stick to the required response format. "
         prompt += "Provide your move as 'Final move: <move>'. Your move must match SAN format, for example: d3, e1d1, Bxf7+. \n"
         return prompt
@@ -95,12 +97,12 @@ class LLMChess:
     def _extract_move(self, response):
         move = response.split("Final move:")[-1].strip().split()[0].strip()
         move = re.sub(r"[.+#]", "", move)
-        #move = re.sub(r"[.]", "", move)
-        #print(move)
-        #return move
+        # move = re.sub(r"[.]", "", move)
+        # print(move)
+        # return move
         pattern = r"Final move:\s*(?:\d+\.\s*)?([a-h1-8][a-h1-8](?:=[QRBN])?[+#]?|[NBRQK][a-h]?[1-8]?x?[a-h][1-8](?:=[QRBN])?[+#]?|O-O-O|O-O)[+#]?"
         match = re.search(pattern, response)
-        #print(match)
+        # print(match)
         if match and self.is_valid_fen_move(self.engine.board, match.group(1)):
             return match.group(1)
         return move

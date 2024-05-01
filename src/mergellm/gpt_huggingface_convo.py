@@ -1,10 +1,10 @@
 """
 Manage the conversation between two LLMs to decide on chess moves.
 """
-import chess
 import re
-import outlines.generate as generate
 
+import chess
+import outlines.generate as generate
 
 
 class LLMHuggingfaceConversation:
@@ -37,32 +37,36 @@ class LLMHuggingfaceConversation:
 
             if round == 1:
                 gpt_prompt = self._generate_prompt(current_state_fen, "Model 1", round)
-                gpt_move, gpt_response = self.generate_and_validate_move(self.gpt, gpt_prompt, board)
+                gpt_move, gpt_response = self.generate_and_validate_move(
+                    self.gpt, gpt_prompt, board
+                )
                 huggingface_move = self.get_move_huggingface(self.huggingface, board)
 
             else:
                 gpt_prompt = self._generate_prompt(
                     current_state_fen, "Model 1", round, huggingface_move
                 )
-                gpt_move, gpt_response = self.generate_and_validate_move(self.gpt, gpt_prompt, board)
-            
+                gpt_move, gpt_response = self.generate_and_validate_move(
+                    self.gpt, gpt_prompt, board
+                )
+
                 huggingface_move = self.get_move_huggingface(self.huggingface, board)
-   
+
             print("GPT Prompt: ", gpt_prompt)
             print("GPT Response: ", gpt_response)
             print("GPT Move: ", gpt_move)
             print("Huggingface Move: ", huggingface_move)
-            if gpt_move and huggingface_move: 
+            if gpt_move and huggingface_move:
                 if gpt_move == huggingface_move or huggingface_move in gpt_move:
                     return gpt_move, round
                 round += 1
-            
+
             # else:
             #     # if round == self.max_rounds:
             #     #     if not gpt_move and not huggingface_move:
             #     #         top_moves = self.engine.get_top_moves(board)
             #     #         new_prompt = f"Choose the best move from these options: {', '.join(top_moves)}. Simply provide your choice as 'Final move: <move>'."
-            #     #         gpt_response = self.gpt.generate_response(new_prompt) 
+            #     #         gpt_response = self.gpt.generate_response(new_prompt)
             #     #         huggingface_response = self.huggingface.generate_response(new_prompt)
             #     #         gpt_move = gpt_response.split("Final move:")[-1].strip().split()[0].strip()
             #     #         huggingface_move = huggingface_response.split("Final move:")[-1].strip().split()[0].strip()
@@ -80,11 +84,11 @@ class LLMHuggingfaceConversation:
             #     round += 1
 
         if gpt_move:
-            return gpt_move, round-1
+            return gpt_move, round - 1
         if huggingface_move:
-            return huggingface_move, round-1
-        return gpt_move, round-1
-    
+            return huggingface_move, round - 1
+        return gpt_move, round - 1
+
     def get_valid_moves(self, board: chess.Board) -> str:
         """
         Generate a regex pattern that matches all legal moves for the given board.
@@ -107,13 +111,12 @@ class LLMHuggingfaceConversation:
         valid_moves = self.get_valid_moves(board)
         move = generate.regex(llm, valid_moves)("1.")
         return move
-        
-    
+
     def generate_and_validate_move(self, llm, prompt, board):
         attempts = 0
         max_attempts = 5
         prompt_new = None
-        #valid_moves = self.get_valid_moves(board)
+        # valid_moves = self.get_valid_moves(board)
         valid_moves = self.engine.get_top_moves(board)
         while attempts < max_attempts:
             prompt += f"\n Choose from the following valid moves for the current position on the board {valid_moves}. "
@@ -122,10 +125,15 @@ class LLMHuggingfaceConversation:
             move = self._extract_move(response)
             if move and self.is_valid_fen_move(board, move):
                 return move, response
-            prompt_new = prompt + f" The move, {move}, you suggested is an invalid move for the given FEN board state. Review the board and give a valid move. " if not prompt_new else prompt_new
+            prompt_new = (
+                prompt
+                + f" The move, {move}, you suggested is an invalid move for the given FEN board state. Review the board and give a valid move. "
+                if not prompt_new
+                else prompt_new
+            )
             attempts += 1
         return None, response
-    
+
     def is_valid_fen_move(self, board, move):
         if move is None:
             return False
@@ -142,7 +150,7 @@ class LLMHuggingfaceConversation:
         prompt = f"Analyze the current board state:\n{fen}\n"
         if other_model_resp:
             prompt += f"Your teammate suggests the move '{other_model_resp}'. "
-            
+
         prompt += f"This is round {round} of the discussion. The discussion will end after {self.max_rounds} rounds."
         prompt += "Provide your reasoning followed by 'Final move: <move>'. Your move must match SAN format, for example: d3, e1d1, Bxf7+. \n"
         return prompt
@@ -150,11 +158,11 @@ class LLMHuggingfaceConversation:
     def _extract_move(self, response):
         move = response.split("Final move:")[-1].strip().split()[0].strip()
         move = re.sub(r"[.]", "", move)
-        #print(move)
-        #return move
+        # print(move)
+        # return move
         pattern = r"Final move:\s*(?:\d+\.\s*)?([a-h1-8][a-h1-8](?:=[QRBN])?[+#]?|[NBRQK][a-h]?[1-8]?x?[a-h][1-8](?:=[QRBN])?[+#]?|O-O-O|O-O)[+#]?"
         match = re.search(pattern, response)
-        #print(match)
+        # print(match)
         if match and self.is_valid_fen_move(self.engine.board, match.group(1)):
             return match.group(1)
         return move

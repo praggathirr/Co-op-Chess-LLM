@@ -4,9 +4,9 @@ Implementation of SLERP to combine two LLMs.
 
 import yaml
 from huggingface_hub import HfApi, HfFolder, Repository
-from transformers import AutoModelForCausalLM, AutoTokenizer
 
 import mergekit
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 class MergeLLM:

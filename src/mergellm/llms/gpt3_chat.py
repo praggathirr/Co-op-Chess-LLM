@@ -5,7 +5,6 @@ import time
 import openai
 from openai import OpenAI
 
-
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -22,14 +21,16 @@ class GPT3ChatModel:
         received = False
         while not received:
             try:
-                response = self.client.chat.completions.create(model=self.model,
-                messages=[
-                    {"role": "user", "content": prompt},
-                ],
-                temperature=self.temperature,
-                stop=None,
-                max_tokens=1000,
-                n=1)
+                response = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=[
+                        {"role": "user", "content": prompt},
+                    ],
+                    temperature=self.temperature,
+                    stop=None,
+                    max_tokens=1000,
+                    n=1,
+                )
                 received = True
             except (openai.PermissionDeniedError, openai.AuthenticationError) as e:
                 print("Permission Denied request:", e)
@@ -43,7 +44,7 @@ class GPT3ChatModel:
             except Exception as e:
                 print("Some other error occurred:", e)
                 time.sleep(1)
-        #print(response)
+        # print(response)
         if response:
             return response.choices[0].message.content
         return None

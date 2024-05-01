@@ -1,4 +1,4 @@
-from transformers import LlamaTokenizer, LlamaForCausalLM, pipeline
+from transformers import LlamaForCausalLM, LlamaTokenizer, pipeline
 
 
 class LLamaModel:
@@ -8,5 +8,7 @@ class LLamaModel:
         self.generator = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
     def generate_response(self, prompt):
-        result = self.generator(prompt, max_length=1000, num_return_sequences=1, truncation=True)
+        result = self.generator(
+            prompt, max_length=1000, num_return_sequences=1, truncation=True
+        )
         return result[0]["generated_text"].strip()

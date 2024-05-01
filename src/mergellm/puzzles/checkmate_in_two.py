@@ -1,14 +1,15 @@
+import csv
 import re
+
 import chess
 import requests
 
-
-import csv
-from mergellm.puzzles.llm_convo_checkmate_multiple import LLMConversation
-from mergellm.puzzles.single_llm_checkmate import LLMCheckmate
 from mergellm.llms.gpt3 import GPT3Model
 from mergellm.llms.gpt3_chat import GPT3ChatModel
+from mergellm.puzzles.llm_convo_checkmate_multiple import LLMConversation
+from mergellm.puzzles.single_llm_checkmate import LLMCheckmate
 from mergellm.stockfish_interface import StockfishInterface
+
 stockfish = StockfishInterface()
 gpt3 = GPT3Model(model="gpt-3.5-turbo-instruct", temperature=0.2)
 gpt3_chat = GPT3ChatModel(model="gpt-3.5-turbo-0125", temperature=0.2)
@@ -17,29 +18,31 @@ llm_convo = LLMConversation(gpt3, gpt3_chat, stockfish, max_rounds=5)
 
 llm_checkmate = LLMCheckmate(gpt3_chat, stockfish)
 
-puzzle_file_path = 'm8n2.txt'
+puzzle_file_path = "m8n2.txt"
+
 
 def is_valid_fen(line):
-    return ' ' in line and ('w' in line or 'b' in line) and '/' in line
+    return " " in line and ("w" in line or "b" in line) and "/" in line
+
 
 def read_puzzles_from_url(url):
     response = requests.get(url)
     response.raise_for_status()
-    content = response.text.split('\n\n')
+    content = response.text.split("\n\n")
     puzzles = []
     fen = None
-    
-    
+
     for game in content:
-        game = game.strip().split('\n')
+        game = game.strip().split("\n")
         for line in game:
             if is_valid_fen(line):
                 fen = line
-            elif fen and '1.' in line:
-                solution = line.split(' ')[1:]
-                puzzles.append((fen, ' '.join(solution)))
+            elif fen and "1." in line:
+                solution = line.split(" ")[1:]
+                puzzles.append((fen, " ".join(solution)))
                 fen = None
     return puzzles
+
 
 # URL to the dataset
 url = "https://wtharvey.com/m8n2.txt"
@@ -48,9 +51,13 @@ puzzles = read_puzzles_from_url(url)
 total_puzzles = len(puzzles)
 print("Total Puzzles: %d" % total_puzzles)
 
+
 # Function to split the move sequence into a list of moves
 def split_solution_sequence(sequence):
-    return re.findall(r'[NBRQK]?[a-h1-8]?x?[a-h][1-8](?:=[NBRQK])?[+#]?|[O-O-O|O-O]+', sequence)
+    return re.findall(
+        r"[NBRQK]?[a-h1-8]?x?[a-h][1-8](?:=[NBRQK])?[+#]?|[O-O-O|O-O]+", sequence
+    )
+
 
 # Testing LLMs with puzzles
 for i, (fen, solution) in enumerate(puzzles):
@@ -76,4 +83,6 @@ for i, (fen, solution) in enumerate(puzzles):
 
 # Calculate and print the final score
 score_percentage = (correct_sequences / total_puzzles) * 100
-print(f"The LLM correctly solved {correct_sequences}/{total_puzzles} ({score_percentage}%) checkmate-in-two puzzles.")
+print(
+    f"The LLM correctly solved {correct_sequences}/{total_puzzles} ({score_percentage}%) checkmate-in-two puzzles."
+)

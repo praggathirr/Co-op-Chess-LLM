@@ -1,9 +1,10 @@
 """
 Manage the conversation between two LLMs to decide on chess moves.
 """
-import chess
-import re
 import random
+import re
+
+import chess
 
 
 class LLMConversation:
@@ -35,7 +36,7 @@ class LLMConversation:
         while round <= self.max_rounds:
             print(round)
             board = chess.Board()
-            moves_clean = re.sub(r'\d+\.', '', current_state_fen)
+            moves_clean = re.sub(r"\d+\.", "", current_state_fen)
             moves_clean = moves_clean.split()
             for move_san in moves_clean:
                 move = board.parse_san(move_san)
@@ -45,19 +46,27 @@ class LLMConversation:
             if round == 1:
                 llm1_prompt = self._generate_prompt(current_state_fen, "Model 1", round)
                 llm2_prompt = self._generate_prompt(current_state_fen, "Model 2", round)
-                llm1_move, llm1_response = self.generate_and_validate_move(self.llm1, llm1_prompt, board)
-                llm2_move, llm2_response = self.generate_and_validate_move(self.llm2, llm2_prompt, board)
+                llm1_move, llm1_response = self.generate_and_validate_move(
+                    self.llm1, llm1_prompt, board
+                )
+                llm2_move, llm2_response = self.generate_and_validate_move(
+                    self.llm2, llm2_prompt, board
+                )
 
             else:
                 llm1_prompt = self._generate_prompt(
                     current_state_fen, "Model 1", round, llm2_response
                 )
-                llm1_move, llm1_response = self.generate_and_validate_move(self.llm1, llm1_prompt, board)
+                llm1_move, llm1_response = self.generate_and_validate_move(
+                    self.llm1, llm1_prompt, board
+                )
 
                 llm2_prompt = self._generate_prompt(
                     current_state_fen, "Model 2", round, llm1_response
                 )
-                llm2_move, llm2_response = self.generate_and_validate_move(self.llm1, llm2_prompt, board)
+                llm2_move, llm2_response = self.generate_and_validate_move(
+                    self.llm1, llm2_prompt, board
+                )
 
             print("LLM 1 Prompt: ", llm1_prompt)
             print("LLM 2 Prompt: ", llm2_prompt)
@@ -67,17 +76,17 @@ class LLMConversation:
             print("\n")
             print("LLM 1 Move: ", llm1_move)
             print("LLM 2 Move: ", llm2_move)
-            if llm1_move and llm2_move: 
+            if llm1_move and llm2_move:
                 if llm1_move == llm2_move:
                     return llm1_move
                 round += 1
-            
+
             else:
                 if round == self.max_rounds:
                     # if not llm1_move and not llm2_move:
                     #     top_moves = self.engine.get_top_moves(board)
                     #     new_prompt = f"Choose the best move from these options: {', '.join(top_moves)}. Simply provide your choice as 'Final move: <move>'."
-                    #     llm1_response = self.llm1.generate_response(new_prompt) 
+                    #     llm1_response = self.llm1.generate_response(new_prompt)
                     #     llm2_response = self.llm2.generate_response(new_prompt)
                     #     llm1_move = llm1_response.split("Final move:")[-1].strip().split()[0].strip()
                     #     llm2_move = llm2_response.split("Final move:")[-1].strip().split()[0].strip()
@@ -100,7 +109,7 @@ class LLMConversation:
                 round += 1
 
         return llm1_move
-    
+
     def get_valid_moves(self, board: chess.Board) -> str:
         """
         Generate a regex pattern that matches all legal moves for the given board.
@@ -116,26 +125,31 @@ class LLMConversation:
         legal_moves = list(board.legal_moves)
         move_strings = [board.san(move) for move in legal_moves]
         random.shuffle(move_strings)
-        #move_strings = [re.sub(r"[+#]", "", move) for move in move_strings]
+        # move_strings = [re.sub(r"[+#]", "", move) for move in move_strings]
         regex_pattern = ", ".join(re.escape(move) for move in move_strings)
         return regex_pattern
-    
+
     def generate_and_validate_move(self, llm, prompt, board):
         attempts = 0
         max_attempts = 5
         prompt_new = None
         valid_moves = self.get_valid_moves(board)
-        #valid_moves = self.engine.get_top_moves(board)
+        # valid_moves = self.engine.get_top_moves(board)
         while attempts < max_attempts:
             prompt += f"\n Choose from the following valid moves for the current position on the board {valid_moves}. "
             response = llm.generate_response(prompt)
             move = self._extract_move(response)
             if move and self.is_valid_fen_move(board, move):
                 return move, response
-            prompt_new = prompt + f" The move, {move}, you suggested is an invalid move for the given board state. Review the board and give a valid move. " if not prompt_new else prompt_new
+            prompt_new = (
+                prompt
+                + f" The move, {move}, you suggested is an invalid move for the given board state. Review the board and give a valid move. "
+                if not prompt_new
+                else prompt_new
+            )
             attempts += 1
         return None, response
-    
+
     def is_valid_fen_move(self, board, move):
         if move is None:
             return False
@@ -152,7 +166,7 @@ class LLMConversation:
         prompt = f"Analyze the moves made until this point:\n{fen}\n"
         if other_model_resp:
             prompt += f"Your teammate suggests '{other_model_resp}'. You may or may not agree with this move. "
-            
+
         prompt += f" Stick to the required response format. This is round {round} of the discussion. The discussion will end after {self.max_rounds} rounds."
         prompt += "The next move must be a checkmate. Provide your move as 'Final move: <move>'. Your move must match SAN format, for example: d3, e1d1, Bxf7+. \n"
         return prompt
@@ -160,12 +174,12 @@ class LLMConversation:
     def _extract_move(self, response):
         move = response.split("Final move:")[-1].strip().split()[0].strip()
         re.sub(r"[.+#]", "", move)
-        #move = re.sub(r"[.]", "", move)
-        #print(move)
-        #return move
+        # move = re.sub(r"[.]", "", move)
+        # print(move)
+        # return move
         pattern = r"Final move:\s*(?:\d+\.\s*)?([a-h1-8][a-h1-8](?:=[QRBN])?[+#]?|[NBRQK][a-h]?[1-8]?x?[a-h][1-8](?:=[QRBN])?[+#]?|O-O-O|O-O)[+#]?"
         match = re.search(pattern, response)
-        #print(match)
+        # print(match)
         if match and self.is_valid_fen_move(self.engine.board, match.group(1)):
             return match.group(1)
         return move

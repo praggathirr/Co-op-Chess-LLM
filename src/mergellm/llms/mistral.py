@@ -5,10 +5,14 @@ class Mistral:
     def __init__(self, model_name="mistralai/Mistral-7B-Instruct-v0.2"):
         self.model = AutoModelForCausalLM.from_pretrained(model_name)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.generator = pipeline("text-generation", model=self.model, tokenizer=self.tokenizer)
+        self.generator = pipeline(
+            "text-generation", model=self.model, tokenizer=self.tokenizer
+        )
 
     def generate_response(self, prompt):
-        result = self.generator(prompt, max_length=1000, num_return_sequences=1, truncation=True)
+        result = self.generator(
+            prompt, max_length=1000, num_return_sequences=1, truncation=True
+        )
         # messages = [
         #     {"role": "user", "content": prompt}
         # ]
