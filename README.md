@@ -1,4 +1,3 @@
-# CS577 Final Project  
 # Co-op LLM: LLMs Working Together to Play Chess
 
 This repo contains code for the final project for CS 57700 (Spring 2024).
