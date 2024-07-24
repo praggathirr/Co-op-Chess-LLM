@@ -1,7 +1,5 @@
 # Co-op LLM: LLMs Working Together to Play Chess
 
-This repo contains code for the final project for CS 57700 (Spring 2024).
-
 ## Abstract
 Large language models (LLMs) have demonstrated remarkable capabilities across a range of tasks, from natural language processing to content generation. However, their ability to make strategic game play decisions, in a game like chess, remains an area with a lot of scope for research. In this paper, "Co-op LLM: LLMs Working Together to Play Chess," we aim to explore the integration of two distinct LLMs to challenge state-of-the-art chess AIs. We propose two innovative approaches: first, merging two LLMs using Spherical Linear Interpolation (SLERP) (Fong and Leung, 2022) to create a hybrid model with potentially improved capabilities; and second, facilitating a structured debate or conversation between two LLMs to collaboratively decide on chess moves, given the current state of the board. This research seeks to uncover whether cooperative models can outperform existing AI chess players, thereby opening new avenues for the application of LLMs in strategic reasoning and decision-making.
 
